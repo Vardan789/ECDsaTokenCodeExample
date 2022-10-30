@@ -23,7 +23,7 @@ Console.WriteLine($"Token - {createdToken}");
 
 Console.WriteLine();
 
-Console.WriteLine(@$"The token was  {(tokenIsValid ? string.Empty : "not")} valid");
+Console.WriteLine(@$"The token was {(tokenIsValid ? string.Empty : "not")} valid");
 
 Console.WriteLine();
 
