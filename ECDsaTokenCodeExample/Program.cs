@@ -2,7 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 
-ECDsa key = ECDsa.Create(new ECParameters
+ECDsa keyExample = ECDsa.Create(new ECParameters
 {
     Curve = ECCurve.NamedCurves.nistP521,
     D = Base64UrlEncoder.DecodeBytes("AU9bFHMSQ72Ku0i8I6wIeWnbeYu1o2OZ75DbxgWkZflVoiI_nS0yv57ilbfNrFItSXZR7nVwRQQDRUppaGxWgV4u"),
@@ -15,11 +15,11 @@ ECDsa key = ECDsa.Create(new ECParameters
 
 string payload = string.Empty; //your  request  body
 
-string token = CreateTokenAsync(key, payload);
+string createdToken = CreateToken(keyExample, payload);
 
-bool tokenIsValid = ValidateTokenAync(token);
+bool tokenIsValid = ValidateToken(createdToken,keyExample);
 
-Console.WriteLine($"Token - {token}");
+Console.WriteLine($"Token - {createdToken}");
 
 Console.WriteLine();
 
@@ -27,12 +27,12 @@ Console.WriteLine(@$"The token was  {(tokenIsValid ? string.Empty : "not")} vali
 
 Console.WriteLine();
 
-string CreateTokenAsync(ECDsa key, string payloadData)
+string CreateToken(ECDsa key, string payloadData)
 {
     var now = DateTime.UtcNow;
-    var handler = new JsonWebTokenHandler();
+    JsonWebTokenHandler handler = new JsonWebTokenHandler();
 
-    string token = handler.CreateToken(new SecurityTokenDescriptor
+    return handler.CreateToken(new SecurityTokenDescriptor
     {
         Issuer = "me",
         Audience = "you",
@@ -40,15 +40,12 @@ string CreateTokenAsync(ECDsa key, string payloadData)
         Claims = new Dictionary<string, object> { { "payload", payloadData } },
         SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(key), "ES512")
     });
-
-    return token;
-
 }
 
-bool ValidateTokenAync(string token)
+bool ValidateToken(string token,ECDsa key)
 {
-    var handler = new JsonWebTokenHandler();
-
+    JsonWebTokenHandler handler = new JsonWebTokenHandler();
+    
     TokenValidationResult result = handler.ValidateToken(token, new TokenValidationParameters
     {
         ValidIssuer = "me",
@@ -56,7 +53,7 @@ bool ValidateTokenAync(string token)
         IssuerSigningKey = new ECDsaSecurityKey(key)
     });
 
-    var isValid = result.IsValid;
+    bool isValid = result.IsValid;
 
     return isValid;
 }
